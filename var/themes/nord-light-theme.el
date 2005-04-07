@@ -5,7 +5,6 @@
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: theme nord light minimal
-;; URL: https://github.com/yourusername/nord-light-theme
 
 ;; This file is NOT part of GNU Emacs.
 
