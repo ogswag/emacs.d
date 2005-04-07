@@ -261,18 +261,13 @@
 (use-package standard-themes
   :ensure t)
 
-(use-package doom-themes
-  :ensure t)
-
-(use-package ef-themes
-  :ensure t)
-
 (use-package modus-themes
   :ensure t)
 
 (use-package spacemacs-theme :straight (spacemacs-theme :type git :host github :repo "nashamri/spacemacs-theme"))
 
-(load-theme 'leuven t)
+(load-theme 'nord-light t)
+
 ;; (use-package auto-dark
 ;;   :ensure t
 ;;   :custom
