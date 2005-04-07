@@ -5,10 +5,15 @@
 
 ;;; Emacs System Options and Packages
 ;;;; General System Options and Packages
+;;;;; Language input config
 (setq-default default-input-method 'russian-computer)
-(keymap-global-set "s-SPC" #'toggle-input-method)
-
-(setq-default custom-safe-themes t)
+(use-package reverse-im
+  :ensure t
+  :demand t
+  :custom
+  (reverse-im-input-methods '("russian-computer"))
+  :config
+  (reverse-im-mode t))
 
 (use-package visual-line-mode
   :ensure nil
@@ -17,18 +22,12 @@
 (global-visual-wrap-prefix-mode t)
 (global-goto-address-mode t)
 
-(setq-default window-divider-default-bottom-width 0)
-
-(setq frame-resize-pixelwise t)
-(setq window-resize-pixelwise t)
-
 (unless (and (eq window-system 'mac)
              (bound-and-true-p mac-carbon-version-string))
   ;; Disable creation of new frames for files opened from Finder
   (setq ns-pop-up-frames nil)
   (setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
   (pixel-scroll-precision-mode 1))
-
 
 ;; Allow Emacs to upgrade built-in packages, such as Org mode
 (setq package-install-upgrade-built-in t)
@@ -101,12 +100,16 @@
   :custom
   (helpful-max-buffers 7))
 
-
-
-;;;; Emacs Windows Options
+;;;; Emacs Window and Frame Options
 ;; Track changes in the window configuration, allowing undoing actions such as
 ;; closing windows.
 (add-hook 'after-init-hook #'winner-mode)
+
+(window-divider-mode nil)
+(setq-default window-divider-default-bottom-width 0)
+
+(setq frame-resize-pixelwise t)
+(setq window-resize-pixelwise t)
 
 ;;;; Emacs Buffers Options
 (use-package uniquify
@@ -225,6 +228,8 @@
 
 
 ;;;; Themes
+(setq-default custom-safe-themes t)
+
 ;; Set the maximum level of syntax highlighting for Tree-sitter modes
 (setq treesit-font-lock-level 4)
 
@@ -245,7 +250,7 @@
 (use-package auto-dark
   :ensure t
   :custom
-  (auto-dark-themes '((doom-dracula) (doom-solarized-light-high-contrast)))
+  (auto-dark-themes '((doom-dracula) (spacemacs-light)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   :init (auto-dark-mode)
@@ -758,7 +763,15 @@
   :ensure t
   :defer t)
 
+;; Fully-fledged terminal emulator inside GNU Emacs based on libvterm,
+(use-package vterm
+  :ensure t)
+
 ;;; Programming Languages
+
+;;;; Vimrc
+(use-package vimrc-mode
+  :ensure t)
 
 ;;;; LaTeX
 (load (expand-file-name "latex.el" user-emacs-directory) t t)

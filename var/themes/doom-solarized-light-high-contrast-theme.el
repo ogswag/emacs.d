@@ -64,6 +64,7 @@ Can be an integer to determine the exact padding."
    (base6      '("#96A7A9" "#96A7A9" "brightblack"  ))
    (base7      '("#788484" "#788484" "brightblack"  ))
    (base8      '("#626C6C" "#626C6C" "black"        ))
+   (func       '("#6c3163" "#6c3163" "brown"        ))
 
    (grey       base4)
    (red        '("#dc322f" "#dc322f" "red"          ))
@@ -133,12 +134,12 @@ Can be an integer to determine the exact padding."
     :background (if doom-solarized-light-high-contrast-brighter-comments
                     (doom-blend teal base0 0.07)
                   'unspecified))
-   ((font-lock-type-face &override))
+   ((font-lock-type-face &override) :weight 'bold)
    ((font-lock-builtin-face &override))
-   ((font-lock-function-name-face &override) :foreground type)
+   ((font-lock-function-name-face &override) :foreground type :weight 'bold)
    ((font-lock-keyword-face &override) :weight 'bold)
    ((font-lock-constant-face &override) :weight 'bold)
-   ((font-lock-string-face &override) :weight 'bold)
+   ((font-lock-string-face &override) :weight)
    (hl-line :background base3)
    ((line-number &override) :foreground base6)
    ((line-number-current-line &override) :foreground fg :background region :weight 'bold)

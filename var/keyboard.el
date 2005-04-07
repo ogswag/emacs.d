@@ -20,6 +20,9 @@
 ;;;;;;;;;;;;;;;;;;;;;
 (keymap-global-set "C-s-f" #'toggle-frame-fullscreen)
 
+(keymap-global-unset "s-q")
+(keymap-global-set "s-q" #'ns-do-hide-emacs)
+
 (keymap-global-set "C-=" #'text-scale-increase)
 (keymap-global-set "C--" #'text-scale-decrease)
 (keymap-global-set "C-0" #'text-scale-adjust)
