@@ -15,9 +15,8 @@
 
 (keymap-global-unset "<mouse-2>") ; upcase-word
 
-;;;;;;;;;;;;;;;;;;;;;
-;;     GENERAL     ;;
-;;;;;;;;;;;;;;;;;;;;;
+
+;;; GENERAL
 (keymap-global-set "C-s-f" #'toggle-frame-fullscreen)
 
 (keymap-global-unset "s-q")
@@ -29,8 +28,11 @@
 
 (keymap-global-set "s-r" #'recentf)
 
-(keymap-global-set "S-s-<up>" #'beginning-of-buffer)
-(keymap-global-set "S-s-<down>" #'end-of-buffer)
+(keymap-global-unset "s-0")
+(keymap-global-unset "s--")
+(keymap-global-unset "s-=")
+(keymap-global-set "s-0" #'beginning-of-buffer)
+(keymap-global-set "s-9" #'end-of-buffer)
 
 (keymap-global-set "s-<up>" #'backward-paragraph)
 (keymap-global-set "s-<down>" #'forward-paragraph)
@@ -39,7 +41,7 @@
 (keymap-global-unset "C-x b")
 (keymap-global-set "C-x b" #'consult-buffer)
 
-(keymap-global-unset "s-k") ;; kill-current-buffer
+(keymap-global-unset "s-k") ;; was kill-current-buffer
 (keymap-global-set "C-s-W" #'kill-buffer-and-window)
 (keymap-global-set "C-s-k" #'kill-current-buffer)
 (keymap-global-set "C-s-w" #'delete-window)
@@ -48,9 +50,7 @@
 (keymap-global-set "C-s-." #'next-buffer)
 
 
-;;;;;;;;;;;;;;;;;;;;;
-;;     EDITING     ;;
-;;;;;;;;;;;;;;;;;;;;;
+;;; EDITING
 (keymap-global-unset "C-M-<down-mouse-1>")
 (keymap-global-set "M-s-<down-mouse-1>" #'mouse-drag-region-rectangle)
 
@@ -94,5 +94,7 @@
 
 (keymap-global-unset "s-l")
 (keymap-global-set "s-l" #'meow-line)
+(keymap-global-unset "s-j")
+(keymap-global-set "s-;" #'meow-reverse)
 
 (keymap-global-set "s-/" #'comment-line)

@@ -1,4 +1,4 @@
-;;; post-init.el --- Post-Init -*- lexical-binding: t; -*-
+;;; Post-init.el --- Post-Init -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 (load custom-file 'noerror 'no-message)
@@ -23,7 +23,7 @@
 
 (use-package visual-line-mode
   :ensure nil
-  :hook (LaTeX-mode latex-mode tex-mode))
+  :hook (LaTeX-mode latex-mode tex-mode eshell-mode))
 
 (global-visual-wrap-prefix-mode t)
 (global-goto-address-mode t)
@@ -173,6 +173,29 @@
     (when args
       (setq dired-listing-switches args))))
 
+;;;; EShell
+
+;; (use-package pcmpl-args
+;; :ensure t)
+
+(use-package pcmpl-homebrew
+  :ensure t)
+
+(use-package pcmpl-pip
+  :ensure t)
+
+(use-package eshell-syntax-highlighting
+  :after eshell-mode
+  :ensure t ;; Install if not already installed.
+  :config
+  ;; Enable in all Eshell buffers.
+  (eshell-syntax-highlighting-global-mode +1))
+
+;;;; Magit
+
+(use-package magit
+  :ensure t)
+
 ;;; Emacs Appearance
 ;; Paren match highlighting
 (add-hook 'after-init-hook #'show-paren-mode)
@@ -184,7 +207,7 @@
     (set-frame-font "Consolas" t t)))
  ((eq system-type 'darwin) ; macOS
   (when (member "Menlo" (font-family-list))
-    (set-frame-font "Menlo 13" t t)
+    (set-frame-font "Menlo 14" t t)
     (set-face-attribute 'fixed-pitch nil :family "Menlo")
     (set-face-attribute 'variable-pitch nil :family "Helvetica Neue")))
  ((eq system-type 'gnu/linux)
@@ -244,16 +267,20 @@
 (use-package ef-themes
   :ensure t)
 
+(use-package modus-themes
+  :ensure t)
+
 (use-package spacemacs-theme :straight (spacemacs-theme :type git :host github :repo "nashamri/spacemacs-theme"))
 
-(use-package auto-dark
-  :ensure t
-  :custom
-  (auto-dark-themes '((spacemacs-dark) (spacemacs-light)))
-  (auto-dark-polling-interval-seconds 5)
-  (auto-dark-allow-osascript t)
-  :init (auto-dark-mode)
-  )
+(load-theme 'leuven t)
+;; (use-package auto-dark
+;;   :ensure t
+;;   :custom
+;;   (auto-dark-themes '((standard-light) (ef-duo-light)))
+;;   (auto-dark-polling-interval-seconds 5)
+;;   (auto-dark-allow-osascript t)
+;;   :init (auto-dark-mode)
+;;   )
 
 ;;;; Line numbers
 ;; Display the current line and column numbers in the mode line
@@ -622,7 +649,7 @@
         "\\*Warnings\\*"
         "\\*Compile-Log\\*"
         "\\*Async-native-compile-log\\*"
-        "^magit-.*:"                    ; Magit process buffers
+        ;; "^magit-.*:"                    ; Magit process buffers
         "\\`\\*\\(EGLOT\\|LSP\\).*\\*\\'" ; Language server buffers
         "\\`\\*tramp.*\\*\\'"))         ; Tramp buffers
 
@@ -648,13 +675,13 @@
              eglot-format-buffer))
 
 ;; Package manager for LSP, DAP, linters, and more for the Emacs Operating System
-(use-package mason
-  :ensure t
-  :config
-  (mason-ensure)
-  ;; or
-  :hook
-  (after-init-hook . mason-ensure))
+;; (use-package mason
+;;   :ensure t
+;;   :config
+;;   (mason-ensure)
+;;   ;; or
+;;   :hook
+;;   (after-init-hook . mason-ensure))
 
 ;; Apheleia is an Emacs package designed to run code formatters (e.g., Shfmt,
 ;; Black and Prettier) asynchronously without disrupting the cursor position.
