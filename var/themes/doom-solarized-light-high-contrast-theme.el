@@ -1,10 +1,7 @@
-;;; doom-solarized-light-theme.el --- a light variant of Solarized -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; doom-solarized-light-high-contrast-theme.el --- a light variant of Solarized -*- lexical-binding: t; no-byte-compile: t; -*-
 ;;
-;; Added: January 9, 2018 (#131)
-;; Author: fuxialexander <https://github.com/fuxialexander>
-;; Maintainer:
-;; Source: https://github.com/bbatsov/solarized-emacs
-;; Source: https://ethanschoonover.com/solarized
+;; Author: ogswag <https://github.com/ogswag>
+;; Maintainer: ogswag <https://github.com/ogswag>
 ;;
 ;;; Commentary:
 ;;; Code:
@@ -15,31 +12,31 @@
 ;;
 ;;; Variables
 
-(defgroup doom-solarized-light-theme nil
-  "Options for the `doom-solarized-light' theme."
+(defgroup doom-solarized-light-high-contrast-theme nil
+  "Options for the `doom-solarized-light-high-contrast' theme."
   :group 'doom-themes)
 
-(defcustom doom-solarized-light-brighter-modeline nil
+(defcustom doom-solarized-light-high-contrast-brighter-modeline nil
   "If non-nil, more vivid colors will be used to style the mode-line."
-  :group 'doom-solarized-light-theme
+  :group 'doom-solarized-light-high-contrast-theme
   :type 'boolean)
 
-(defcustom doom-solarized-light-brighter-comments nil
+(defcustom doom-solarized-light-high-contrast-brighter-comments nil
   "If non-nil, comments will be highlighted in more vivid colors."
-  :group 'doom-solarized-light-theme
+  :group 'doom-solarized-light-high-contrast-theme
   :type 'boolean)
 
-(defcustom doom-solarized-light-padded-modeline doom-themes-padded-modeline
+(defcustom doom-solarized-light-high-contrast-padded-modeline doom-themes-padded-modeline
   "If non-nil, adds a 4px padding to the mode-line.
 Can be an integer to determine the exact padding."
-  :group 'doom-solarized-light-theme
+  :group 'doom-solarized-light-high-contrast-theme
   :type '(choice integer boolean))
 
 
 ;;
 ;;; Theme definition
 
-(def-doom-theme doom-solarized-light
+(def-doom-theme doom-solarized-light-high-contrast
     "A light theme inspired by Solarized light"
   :family 'doom-solarized
   :background-mode 'light
@@ -71,22 +68,22 @@ Can be an integer to determine the exact padding."
    (grey       base4)
    (red        '("#dc322f" "#dc322f" "red"          ))
    (orange     '("#cb4b16" "#cb4b16" "brightred"    ))
-   (green      '("#859900" "#859900" "green"        ))
-   (teal       '("#35a69c" "#35a69c" "brightgreen"  ))
-   (yellow     '("#b58900" "#b58900" "yellow"       ))
-   (blue       '("#268bd2" "#268bd2" "brightblue"   ))
-   (dark-blue  '("#3F88AD" "#3F88AD" "blue"         ))
-   (magenta    '("#d33682" "#d33682" "magenta"      ))
+   (green      '("#088600" "#088600" "green"        ))
+   (teal       '("#007E60" "#007E60" "brightgreen"  ))
+   (yellow     '("#987B00" "#987B00" "yellow"       ))
+   (blue       '("#006ED9" "#006ED9" "brightblue"   ))
+   (dark-blue  '("#007B9C" "#007B9C" "blue"         ))
+   (magenta    '("#DE006B" "#DE006B" "magenta"      ))
    (violet     '("#6c71c4" "#6c71c4" "brightmagenta"))
-   (cyan       '("#2aa198" "#2aa198" "brightcyan"   ))
-   (dark-cyan  '("#204052" "#204052" "cyan"         ))
+   (cyan       '("#00807B" "#00807B" "brightcyan"   ))
+   (dark-cyan  '("#00524F" "#00524F" "cyan"         ))
 
    ;; face categories -- required for all themes
    (highlight      blue)
    (vertical-bar   base4)
    (selection      dark-blue)
    (builtin        magenta)
-   (comments       (if doom-solarized-light-brighter-comments
+   (comments       (if doom-solarized-light-high-contrast-brighter-comments
                        (doom-lighten teal 0.25)
                      base7))
    (doc-comments   teal)
@@ -108,10 +105,10 @@ Can be an integer to determine the exact padding."
    (vc-deleted     red)
 
    ;; custom categories
-   (-modeline-bright doom-solarized-light-brighter-modeline)
+   (-modeline-bright doom-solarized-light-high-contrast-brighter-modeline)
    (-modeline-pad
-    (when doom-solarized-light-padded-modeline
-      (if (integerp doom-solarized-light-padded-modeline) doom-solarized-light-padded-modeline 4)))
+    (when doom-solarized-light-high-contrast-padded-modeline
+      (if (integerp doom-solarized-light-high-contrast-padded-modeline) doom-solarized-light-high-contrast-padded-modeline 4)))
 
    (modeline-fg
     (if -modeline-bright
@@ -133,7 +130,7 @@ Can be an integer to determine the exact padding."
 
   ;;;; Base theme face overrides
   (((font-lock-comment-face &override)
-    :background (if doom-solarized-light-brighter-comments
+    :background (if doom-solarized-light-high-contrast-brighter-comments
                     (doom-blend teal base0 0.07)
                   'unspecified))
    ((font-lock-type-face &override))
@@ -141,6 +138,7 @@ Can be an integer to determine the exact padding."
    ((font-lock-function-name-face &override) :foreground type)
    ((font-lock-keyword-face &override) :weight 'bold)
    ((font-lock-constant-face &override) :weight 'bold)
+   ((font-lock-string-face &override) :weight 'bold)
    (hl-line :background base3)
    ((line-number &override) :foreground base6)
    ((line-number-current-line &override) :foreground fg :background region :weight 'bold)
@@ -225,4 +223,4 @@ Can be an integer to determine the exact padding."
   ;; ()
   )
 
-;;; doom-solarized-light-theme.el ends here
+;;; doom-solarized-light-high-contrast-theme.el ends here

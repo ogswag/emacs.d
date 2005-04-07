@@ -1,3 +1,4 @@
+;;; pre-init.el --- pre-init -*- lexical-binding: t; -*-
 ;; Straight bootstrap
 (defvar bootstrap-version)
 (let ((bootstrap-file

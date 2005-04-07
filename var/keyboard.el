@@ -1,4 +1,4 @@
-;;; keyboard.el --- keybindings -*- lexical-binding: t; -*-
+;;; keyboard.el --- keybindings -*- no-byte-compile: t; lexical-binding: t; -*-
 
 (keymap-global-unset "C-M-<wheel-down>") ; mouse-wheel-global-text-scale
 (keymap-global-unset "C-M-<wheel-up>") ; mouse-wheel-global-text-scale
