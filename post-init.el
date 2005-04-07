@@ -11,6 +11,33 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
+;; Optimization: Native Compilation
+(use-package compile-angel
+  :demand t
+  :ensure t
+  :custom
+  (compile-angel-verbose nil)
+
+  :config
+  (push "/init.el" compile-angel-excluded-files)
+  (push "/early-init.el" compile-angel-excluded-files)
+  (push "/pre-init.el" compile-angel-excluded-files)
+  (push "/post-init.el" compile-angel-excluded-files)
+  (push "/pre-early-init.el" compile-angel-excluded-files)
+  (push "/post-early-init.el" compile-angel-excluded-files)
+
+  ;; A local mode that compiles .el files whenever the user saves them.
+  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
+
+  ;; A global mode that compiles .el files prior to loading them via `load' or
+  ;; `require'. Additionally, it compiles all packages that were loaded before
+  ;; the mode `compile-angel-on-load-mode' was activated.
+  (compile-angel-on-load-mode 1)
+  )
+
+(use-package rainbow-mode
+  :ensure t)
+
 ;;;;; Language input config
 (setq-default default-input-method 'russian-computer)
 (use-package reverse-im
@@ -53,29 +80,6 @@
 
 (context-menu-mode t)
 
-;; Optimization: Native Compilation
-(use-package compile-angel
-  :demand t
-  :ensure t
-  :custom
-  (compile-angel-verbose nil)
-
-  :config
-  (push "/init.el" compile-angel-excluded-files)
-  (push "/early-init.el" compile-angel-excluded-files)
-  (push "/pre-init.el" compile-angel-excluded-files)
-  (push "/post-init.el" compile-angel-excluded-files)
-  (push "/pre-early-init.el" compile-angel-excluded-files)
-  (push "/post-early-init.el" compile-angel-excluded-files)
-
-  ;; A local mode that compiles .el files whenever the user saves them.
-  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
-
-  ;; A global mode that compiles .el files prior to loading them via `load' or
-  ;; `require'. Additionally, it compiles all packages that were loaded before
-  ;; the mode `compile-angel-on-load-mode' was activated.
-  (compile-angel-on-load-mode 1)
-  )
 
 (use-package which-key
   :ensure nil ; already builtin
@@ -254,17 +258,6 @@
 
 ;; Set the maximum level of syntax highlighting for Tree-sitter modes
 (setq treesit-font-lock-level 4)
-
-(use-package leuven-theme
-  :ensure t)
-
-(use-package standard-themes
-  :ensure t)
-
-(use-package modus-themes
-  :ensure t)
-
-(use-package spacemacs-theme :straight (spacemacs-theme :type git :host github :repo "nashamri/spacemacs-theme"))
 
 (load-theme 'nord-light t)
 
@@ -787,8 +780,7 @@
 ;;;; Cool things
 ;;  Draw ▶─UNICODE diagrams─◀ within ▶─your texts─◀ in Emacs
 (use-package uniline
-  :ensure t
-  :defer t)
+  :ensure t)
 
 ;; Fully-fledged terminal emulator inside GNU Emacs based on libvterm,
 (use-package vterm

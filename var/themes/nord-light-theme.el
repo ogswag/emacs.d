@@ -1,7 +1,7 @@
 ;;; nord-light-theme.el --- Nord light theme based on modus operandi -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2005
-;; Author: Alexander Zakhrov
+;; Author: Alexander Zakharov
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: theme nord light minimal
@@ -27,9 +27,8 @@
 ;;; Code:
 
 (deftheme nord-light
-  "Clean light theme based on Nord palette with tokyonight-day accents.")
+  "Clean light theme based on Nord palette and darkened for visibility on light background.")
 
-;; IMPORTANT: All color definitions and face customizations MUST stay within this let() block
 (let* ((class '((class color) (min-colors 256)))
        ;; Nord palette - base colors
        (nord0  "#2E3440")   ; Polar Night darkest
@@ -51,9 +50,9 @@
 
        (bg-main     "#F9FAFB")
        (bg-dim      "#F3F4F6")
-       (bg-alt      "#EEEFF2")
+       (bg-alt      "#EBEDF0")
        (fg-main     "#2B3E50")
-       (fg-dim      "#4A5568")
+       (fg-dim      "#6F7F9E")
        (fg-alt      "#718096")
 
        (accent-blue      "#2F58B6")
