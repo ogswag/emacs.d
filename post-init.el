@@ -502,8 +502,18 @@
    consult--source-bookmark consult--source-file-register
    consult--source-recent-file consult--source-project-recent-file
    ;; :preview-key "M-."
-   :preview-key '(:debounce 0.4 any))
+   ;; :preview-key '(:debounce 0.4 any)
+   )
   (setq consult-narrow-key "<"))
+
+(setq-default consult-preview-key nil)
+
+;; Disable preview for buffer-related commands only
+;; (consult-customize
+;; consult-buffer :preview-key nil
+;; consult-recent-file :preview-key nil
+;; consult-project-buffer :preview-key nil)
+
 
 ;; The outline-indent Emacs package provides a minor mode that enables code
 ;; folding based on indentation levels.
@@ -624,6 +634,27 @@
   ;; If you see <mouse-4>/<mouse-5> too, unset them as well
   (keymap-unset centaur-tabs-mode-map "<tab-line> <mouse-4>")
   (keymap-unset centaur-tabs-mode-map "<tab-line> <mouse-5>"))
+
+;; Skip all buffers starting with *
+(setq switch-to-prev-buffer-skip-regexp "\\*.*\\*")
+(setq consult-buffer-filter
+      '("\\` "                           ; Hidden buffers (space prefix)
+        "\\*.*\\*"                      ; All internal buffers
+        "^magit-.*:"                    ; Magit process buffers
+        "\\`\\*\\(EGLOT\\|LSP\\).*\\*\\'" ; Language server buffers
+        "\\`\\*tramp.*\\*\\'"))         ; Tramp buffers
+
+;; Remove recent files completely from consult-buffer
+(setq consult-buffer-sources
+      '(;; consult--source-hidden-buffer     ; Hidden buffers (SPC to show)
+        ;; consult--source-modified-buffer   ; Modified buffers (* to show)
+        consult--source-buffer           ; Regular buffers
+        ;; consult--source-bookmark         ; Bookmarks (m to show)
+        ;; consult--source-file-register    ; File registers (r to show)
+        consult--source-project-buffer   ; Project buffers
+        ;; consult--source-recent-file   ; Remove this line
+        ;; consult--source-project-recent-file ; Optionally remove this too
+        ))
 
 ;; Set up the Language Server Protocol (LSP) servers using Eglot.
 (use-package eglot

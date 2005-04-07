@@ -13,7 +13,6 @@
 (keymap-global-unset "M-<mouse-1>") ;; set secondary selection start
 (keymap-global-unset "M-<mouse-3>") ;; set secondary selection end
 
-
 (keymap-global-unset "<mouse-2>") ; upcase-word
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -27,11 +26,22 @@
 
 (keymap-global-set "s-r" #'recentf)
 
-(keymap-global-set "s-<up>" #'beginning-of-buffer)
-(keymap-global-set "s-<down>" #'end-of-buffer)
+(keymap-global-set "S-s-<up>" #'beginning-of-buffer)
+(keymap-global-set "S-s-<down>" #'end-of-buffer)
 
 (keymap-global-set "s-<up>" #'backward-paragraph)
 (keymap-global-set "s-<down>" #'forward-paragraph)
+
+(keymap-global-set "s-b" #'consult-buffer)
+(keymap-global-unset "C-x b")
+(keymap-global-set "C-x b" #'consult-buffer)
+
+(keymap-global-unset "s-k") ;; kill-current-buffer
+(keymap-global-set "C-s-k" #'kill-current-buffer)
+(keymap-global-set "C-s-w" #'delete-window)
+(keymap-global-set "C-s-0" #'kill-buffer-and-window)
+(keymap-global-set "C-s-," #'previous-buffer)
+(keymap-global-set "C-s-." #'next-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;;     EDITING     ;;
@@ -41,7 +51,15 @@
 
 (defun my-delete-line-backwards ()
   (interactive)
-  (delete-region (point) (line-beginning-position)))
+  (cond
+   ;; If at beginning of line, delete previous newline (join lines)
+   ((= (point) (line-beginning-position))
+    (delete-char -1))
+
+   ;; Otherwise delete to beginning of line
+   (t
+    (delete-region (point) (line-beginning-position)))))
+
 (keymap-global-set "s-<backspace>" #'my-delete-line-backwards)
 
 (keymap-global-unset "s-l")
