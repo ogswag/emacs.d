@@ -37,8 +37,8 @@
 (keymap-global-set "C-x b" #'consult-buffer)
 
 (keymap-global-unset "s-k") ;; kill-current-buffer
-(keymap-global-set "C-s-k" #'kill-current-buffer)
 (keymap-global-set "C-s-w" #'delete-window)
+(keymap-global-set "C-s--" #'kill-current-buffer)
 (keymap-global-set "C-s-0" #'kill-buffer-and-window)
 (keymap-global-set "C-s-," #'previous-buffer)
 (keymap-global-set "C-s-." #'next-buffer)
@@ -61,6 +61,31 @@
     (delete-region (point) (line-beginning-position)))))
 
 (keymap-global-set "s-<backspace>" #'my-delete-line-backwards)
+
+
+(defun my-move-bol-or-prev-eol ()
+  "Move to beginning of line, or to end of previous line if already at bol."
+  (interactive)
+  (if (bolp)
+      (progn
+        (forward-line -1)
+        (end-of-line))
+    (beginning-of-line)))
+
+(defun my-move-eol-or-next-bol ()
+  "Move to beginning of line, or to end of previous line if already at bol."
+  (interactive)
+  (if (eolp)
+      (progn
+        (forward-line 1)
+        (beginning-of-line))
+    (end-of-line)))
+
+(keymap-global-unset "s-<left>")
+(keymap-global-unset "s-<right>")
+(keymap-global-set "s-<right>" #'my-move-eol-or-next-bol)
+(keymap-global-set "s-<left>" #'my-move-bol-or-prev-eol)
+
 
 (keymap-global-unset "s-l")
 (keymap-global-set "s-l" #'meow-line)

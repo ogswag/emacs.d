@@ -1,7 +1,10 @@
 ;;; post-init.el --- Post-Init -*- lexical-binding: t; -*-
-
+;;; Commentary:
+;;; Code:
 (load custom-file 'noerror 'no-message)
 
+;;; Emacs System Options and Packages
+;;;; General System Options and Packages
 (setq-default default-input-method 'russian-computer)
 (keymap-global-set "s-SPC" #'toggle-input-method)
 
@@ -19,80 +22,13 @@
 (setq frame-resize-pixelwise t)
 (setq window-resize-pixelwise t)
 
-;; Set default font
-(cond
- ((eq system-type 'windows-nt)
-  (when (member "Consolas" (font-family-list))
-    (set-frame-font "Consolas" t t)))
- ((eq system-type 'darwin) ; macOS
-  (when (member "Menlo" (font-family-list))
-    (set-frame-font "Menlo 13" t t)
-    (set-face-attribute 'fixed-pitch nil :family "Menlo")
-    (set-face-attribute 'variable-pitch nil :family "Helvetica Neue")))
- ((eq system-type 'gnu/linux)
-  (when (member "DejaVu Sans Mono" (font-family-list))
-    (set-frame-font "DejaVu Sans Mono" t t))))
-
-;; Set Font for Unicode Symbols
-;; Symbols here mean unicode characters that are math ∫ , tech symbols ⌘ , or
-;; dingbats ☭ , but excluding emoji.
-(set-fontset-font
- t
- 'symbol
- (cond
-  ((eq system-type 'windows-nt)
-   (cond
-    ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
-  ((eq system-type 'darwin)
-   (cond
-    ((member "Apple Symbols" (font-family-list)) "Apple Symbols")))
-  ((eq system-type 'gnu/linux)
-   (cond
-    ((member "Symbola" (font-family-list)) "Symbola")))))
-
-(progn
-  ;; set font for emoji
-  ;; if before emacs 28, this should come after setting symbols, because emacs
-  ;; 28 now has 'emoji . before, emoji is part of 'symbol
-  (set-fontset-font
-   t
-   (if (< emacs-major-version 28)
-       '(#x1f300 . #x1fad0)
-     'emoji
-     )
-   (cond
-    ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji")
-    ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
-    ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
-    ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
-    ((member "Symbola" (font-family-list)) "Symbola"))))
-
-(use-package leuven-theme
-  :ensure t)
-
-(use-package standard-themes
-  :ensure t)
-
-(use-package srcery-theme
-  :ensure t)
-
-;; (setq-default doom-solarized-light-brighter-modeline t)
-
-(use-package auto-dark
-  :ensure t
-  :custom
-  (auto-dark-themes '((doom-twilight) (doom-solarized-light)))
-  (auto-dark-polling-interval-seconds 5)
-  (auto-dark-allow-osascript t)
-  :init (auto-dark-mode)
-  )
-
 (unless (and (eq window-system 'mac)
              (bound-and-true-p mac-carbon-version-string))
   ;; Disable creation of new frames for files opened from Finder
   (setq ns-pop-up-frames nil)
   (setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
   (pixel-scroll-precision-mode 1))
+
 
 ;; Allow Emacs to upgrade built-in packages, such as Org mode
 (setq package-install-upgrade-built-in t)
@@ -112,23 +48,32 @@
 
 (context-menu-mode t)
 
-;; Display the current line and column numbers in the mode line
-(setq line-number-mode t)
-(setq column-number-mode t)
-(setq mode-line-position-column-line-format '("%l:%C"))
+;; Optimization: Native Compilation
+(use-package compile-angel
+  :demand t
+  :ensure t
+  :custom
+  (compile-angel-verbose nil)
 
-;; Display of line numbers in the buffer:
-(setq-default display-line-numbers-type 'relative)
-(dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-  (add-hook hook #'display-line-numbers-mode))
-(setq-default display-line-numbers-grow-only t)
-(setq-default display-line-numbers-width-start t)
+  :config
+  (push "/init.el" compile-angel-excluded-files)
+  (push "/early-init.el" compile-angel-excluded-files)
+  (push "/pre-init.el" compile-angel-excluded-files)
+  (push "/post-init.el" compile-angel-excluded-files)
+  (push "/pre-early-init.el" compile-angel-excluded-files)
+  (push "/post-early-init.el" compile-angel-excluded-files)
 
-;; Set the maximum level of syntax highlighting for Tree-sitter modes
-(setq treesit-font-lock-level 4)
+  ;; A local mode that compiles .el files whenever the user saves them.
+  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
+
+  ;; A global mode that compiles .el files prior to loading them via `load' or
+  ;; `require'. Additionally, it compiles all packages that were loaded before
+  ;; the mode `compile-angel-on-load-mode' was activated.
+  (compile-angel-on-load-mode 1)
+  )
 
 (use-package which-key
-  :ensure nil ; builtin
+  :ensure nil ; already builtin
   :commands which-key-mode
   :hook (after-init . which-key-mode)
   :custom
@@ -137,13 +82,33 @@
   (which-key-add-column-padding 1)
   (which-key-max-description-length 40))
 
-;; Paren match highlighting
-(add-hook 'after-init-hook #'show-paren-mode)
+;; Helpful is an alternative to the built-in Emacs help that provides much more
+;; contextual information.
+(use-package helpful
+  :ensure t
+  :commands (helpful-callable
+             helpful-variable
+             helpful-key
+             helpful-command
+             helpful-at-point
+             helpful-function)
+  :bind
+  ([remap describe-command] . helpful-command)
+  ([remap describe-function] . helpful-callable)
+  ([remap describe-key] . helpful-key)
+  ([remap describe-symbol] . helpful-symbol)
+  ([remap describe-variable] . helpful-variable)
+  :custom
+  (helpful-max-buffers 7))
 
+
+
+;;;; Emacs Windows Options
 ;; Track changes in the window configuration, allowing undoing actions such as
 ;; closing windows.
 (add-hook 'after-init-hook #'winner-mode)
 
+;;;; Emacs Buffers Options
 (use-package uniquify
   :ensure nil
   :custom
@@ -151,6 +116,13 @@
   (uniquify-separator "•")
   (uniquify-after-kill-buffer-p t))
 
+;; Enables visual indication of minibuffer recursion depth after initialization.
+(add-hook 'after-init-hook #'minibuffer-depth-indicate-mode)
+
+;; Enables visual indication of minibuffer recursion depth after initialization.
+(add-hook 'after-init-hook #'minibuffer-depth-indicate-mode)
+
+;;;; Dired
 ;; Constrain vertical cursor movement to lines within the buffer
 (setq dired-movement-style 'bounded-files)
 
@@ -192,12 +164,6 @@
     (when args
       (setq dired-listing-switches args))))
 
-;; Enables visual indication of minibuffer recursion depth after initialization.
-(add-hook 'after-init-hook #'minibuffer-depth-indicate-mode)
-
-;; Enables visual indication of minibuffer recursion depth after initialization.
-(add-hook 'after-init-hook #'minibuffer-depth-indicate-mode)
-
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (use-package exec-path-from-shell
@@ -205,29 +171,106 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
-;; Optimization: Native Compilation
-(use-package compile-angel
-  :demand t
+;;; Emacs Appearance
+;; Paren match highlighting
+(add-hook 'after-init-hook #'show-paren-mode)
+
+;;;; Set default font
+(cond
+ ((eq system-type 'windows-nt)
+  (when (member "Consolas" (font-family-list))
+    (set-frame-font "Consolas" t t)))
+ ((eq system-type 'darwin) ; macOS
+  (when (member "Menlo" (font-family-list))
+    (set-frame-font "Menlo 13" t t)
+    (set-face-attribute 'fixed-pitch nil :family "Menlo")
+    (set-face-attribute 'variable-pitch nil :family "Helvetica Neue")))
+ ((eq system-type 'gnu/linux)
+  (when (member "DejaVu Sans Mono" (font-family-list))
+    (set-frame-font "DejaVu Sans Mono" t t))))
+
+;;;; Set Font for Unicode Symbols
+;; Symbols here mean unicode characters that are math ∫ , tech symbols ⌘ , or
+;; dingbats ☭ , but excluding emoji.
+(set-fontset-font
+ t
+ 'symbol
+ (cond
+  ((eq system-type 'windows-nt)
+   (cond
+    ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
+  ((eq system-type 'darwin)
+   (cond
+    ((member "Apple Symbols" (font-family-list)) "Apple Symbols")))
+  ((eq system-type 'gnu/linux)
+   (cond
+    ((member "Symbola" (font-family-list)) "Symbola")))))
+
+;;;; Set font for emoji
+(progn
+
+  ;; if before emacs 28, this should come after setting symbols, because emacs
+  ;; 28 now has 'emoji . before, emoji is part of 'symbol
+  (set-fontset-font
+   t
+   (if (< emacs-major-version 28)
+       '(#x1f300 . #x1fad0)
+     'emoji
+     )
+   (cond
+    ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji")
+    ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
+    ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
+    ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
+    ((member "Symbola" (font-family-list)) "Symbola"))))
+
+
+;;;; Themes
+;; Set the maximum level of syntax highlighting for Tree-sitter modes
+(setq treesit-font-lock-level 4)
+
+(use-package leuven-theme
+  :ensure t)
+
+(use-package standard-themes
+  :ensure t)
+
+(use-package srcery-theme
+  :ensure t)
+
+(use-package spacemacs-theme :straight (spacemacs-theme :type git :host github :repo "nashamri/spacemacs-theme"))
+
+(use-package auto-dark
   :ensure t
   :custom
-  (compile-angel-verbose nil)
-
-  :config
-  (push "/init.el" compile-angel-excluded-files)
-  (push "/early-init.el" compile-angel-excluded-files)
-  (push "/pre-init.el" compile-angel-excluded-files)
-  (push "/post-init.el" compile-angel-excluded-files)
-  (push "/pre-early-init.el" compile-angel-excluded-files)
-  (push "/post-early-init.el" compile-angel-excluded-files)
-
-  ;; A local mode that compiles .el files whenever the user saves them.
-  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
-
-  ;; A global mode that compiles .el files prior to loading them via `load' or
-  ;; `require'. Additionally, it compiles all packages that were loaded before
-  ;; the mode `compile-angel-on-load-mode' was activated.
-  (compile-angel-on-load-mode 1)
+  (auto-dark-themes '((doom-twilight) (doom-solarized-light)))
+  (auto-dark-polling-interval-seconds 5)
+  (auto-dark-allow-osascript t)
+  :init (auto-dark-mode)
   )
+
+;;;; Line numbers
+;; Display the current line and column numbers in the mode line
+(setq line-number-mode t)
+(setq column-number-mode t)
+(setq mode-line-position-column-line-format '("%l:%C"))
+
+;; Display of line numbers in the buffer:
+(setq-default display-line-numbers-type 'relative)
+(dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+  (add-hook hook #'display-line-numbers-mode))
+(setq-default display-line-numbers-grow-only t)
+(setq-default display-line-numbers-width-start t)
+
+;;; Text editing options and packages
+;;;; General text editing packages and config
+;; Simple comment-based outline folding for Emacs
+(use-package outli
+  :ensure t
+  ;; :after lispy ; uncomment only if you use lispy; it also sets speed keys on headers!
+  :bind (:map outli-mode-map ; convenience key to get back to containing heading
+	          ("C-c C-p" . (lambda () (interactive) (outline-back-to-heading))))
+  :hook ((prog-mode text-mode) . outli-mode)) ; or whichever modes you prefer
 
 ;; Auto-revert in Emacs is a feature that automatically updates the
 ;; contents of a buffer to reflect changes made to the underlying file
@@ -298,6 +341,7 @@
   :custom
   (save-place-limit 400))
 
+;;;; Better completion packages
 ;; Corfu enhances in-buffer completion by displaying a compact popup with
 ;; current candidates, positioned either below or above the point. Candidates
 ;; can be selected by navigating up or down.
@@ -501,96 +545,22 @@
    consult-bookmark consult-recent-file consult-xref
    consult--source-bookmark consult--source-file-register
    consult--source-recent-file consult--source-project-recent-file
+   consult-buffer :preview-key nil
+   consult-recent-file :preview-key nil
+   consult-project-buffer :preview-key nil
    ;; :preview-key "M-."
    ;; :preview-key '(:debounce 0.4 any)
    )
   (setq consult-narrow-key "<"))
 
-(setq-default consult-preview-key nil)
+;; (setq-default consult-preview-key nil)
 
 ;; Disable preview for buffer-related commands only
 ;; (consult-customize
-;; consult-buffer :preview-key nil
-;; consult-recent-file :preview-key nil
-;; consult-project-buffer :preview-key nil)
+;;  consult-buffer :preview-key nil
+;;  consult-recent-file :preview-key nil
+;;  consult-project-buffer :preview-key nil)
 
-
-;; The outline-indent Emacs package provides a minor mode that enables code
-;; folding based on indentation levels.
-;;
-;; In addition to code folding, *outline-indent* allows:
-;; - Moving indented blocks up and down
-;; - Indenting/unindenting to adjust indentation levels
-;; - Inserting a new line with the same indentation level as the current line
-;; - Move backward/forward to the indentation level of the current line
-;; - and other features.
-(use-package outline-indent
-  :ensure t
-  :commands outline-indent-minor-mode
-
-  :custom
-  (outline-indent-ellipsis " ▼")
-
-  :init
-  ;; The minor mode can also be automatically activated for a certain modes.
-  (add-hook 'python-mode-hook #'outline-indent-minor-mode)
-  (add-hook 'python-ts-mode-hook #'outline-indent-minor-mode)
-
-  (add-hook 'yaml-mode-hook #'outline-indent-minor-mode)
-  (add-hook 'yaml-ts-mode-hook #'outline-indent-minor-mode))
-
-;; Apheleia is an Emacs package designed to run code formatters (e.g., Shfmt,
-;; Black and Prettier) asynchronously without disrupting the cursor position.
-(use-package apheleia
-  :ensure t
-  :commands (apheleia-mode
-             apheleia-global-mode)
-  :hook ((prog-mode . apheleia-mode)))
-
-;; Enables automatic indentation of code while typing
-(use-package aggressive-indent
-  :ensure t
-  :commands aggressive-indent-mode
-  :hook
-  (emacs-lisp-mode . aggressive-indent-mode))
-
-;; Highlights function and variable definitions in Emacs Lisp mode
-(use-package highlight-defined
-  :ensure t
-  :commands highlight-defined-mode
-  :hook
-  (emacs-lisp-mode . highlight-defined-mode))
-
-;; Tree-sitter in Emacs is an incremental parsing system introduced in Emacs 29
-;; that provides precise, high-performance syntax highlighting. It supports a
-;; broad set of programming languages, including Bash, C, C++, C#, CMake, CSS,
-;; Dockerfile, Go, Java, JavaScript, JSON, Python, Rust, TOML, TypeScript, YAML,
-;; Elisp, Lua, Markdown, and many others.
-(use-package treesit-auto
-  :ensure t
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  ;; (global-treesit-auto-mode)
-  )
-
-(setq treesit-language-source-alist
-      '((elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
-        )
-      )
-
-(dolist (source treesit-language-source-alist)
-  (unless (treesit-ready-p (car source))
-    (treesit-install-language-grammar (car source))))
-
-;; treesit-fold builds on top of treesit.el to provide code folding based on the tree-sitter syntax tree.
-(use-package treesit-fold :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold"))
-
-(global-treesit-fold-mode t)
-(use-package treesit-fold-indicators
-  :straight (treesit-fold-indicators :type git :host github :repo "emacs-tree-sitter/treesit-fold"))
-(global-treesit-fold-indicators-mode t)
 
 ;; The undo-fu package is a lightweight wrapper around Emacs' built-in undo
 ;; system, providing more convenient undo/redo functionality.
@@ -656,6 +626,8 @@
         ;; consult--source-project-recent-file ; Optionally remove this too
         ))
 
+
+;;;; LSP, formatting, etc.
 ;; Set up the Language Server Protocol (LSP) servers using Eglot.
 (use-package eglot
   :ensure nil
@@ -663,6 +635,38 @@
              eglot-rename
              eglot-format-buffer))
 
+;; Package manager for LSP, DAP, linters, and more for the Emacs Operating System
+(use-package mason
+  :ensure t
+  :config
+  (mason-ensure)
+  ;; or
+  :hook
+  (after-init-hook . mason-ensure))
+
+;; Apheleia is an Emacs package designed to run code formatters (e.g., Shfmt,
+;; Black and Prettier) asynchronously without disrupting the cursor position.
+(use-package apheleia
+  :ensure t
+  :commands (apheleia-mode
+             apheleia-global-mode)
+  :hook ((prog-mode . apheleia-mode)))
+
+;; Enables automatic indentation of code while typing
+(use-package aggressive-indent
+  :ensure t
+  :commands aggressive-indent-mode
+  :hook
+  (emacs-lisp-mode . aggressive-indent-mode))
+
+;; Highlights function and variable definitions in Emacs Lisp mode
+(use-package highlight-defined
+  :ensure t
+  :commands highlight-defined-mode
+  :hook
+  (emacs-lisp-mode . highlight-defined-mode))
+
+;;;; Session management
 ;; The easysession Emacs package is a session manager for Emacs that can persist
 ;; and restore file editing buffers, indirect buffers/clones, Dired buffers,
 ;; windows/splits, the built-in tab-bar (including tabs, their buffers, and
@@ -694,22 +698,8 @@
   (add-hook 'emacs-startup-hook #'easysession-load-including-geometry 102)
   (add-hook 'emacs-startup-hook #'easysession-save-mode 103))
 
-;; The markdown-mode package provides a major mode for Emacs for syntax
-;; highlighting, editing commands, and preview support for Markdown documents.
-;; It supports core Markdown syntax as well as extensions like GitHub Flavored
-;; Markdown (GFM).
-(use-package markdown-mode
-  :commands (gfm-mode
-             gfm-view-mode
-             markdown-mode
-             markdown-view-mode)
-  :mode (("\\.markdown\\'" . markdown-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("README\\.md\\'" . gfm-mode))
-  :bind
-  (:map markdown-mode-map
-        ("C-c C-e" . markdown-do)))
 
+;;;; Project Management
 ;; A file and project explorer for Emacs that displays a structured tree
 ;; layout, similar to file browsers in modern IDEs. It functions as a sidebar
 ;; in the left window, providing a persistent view of files, projects, and
@@ -813,6 +803,7 @@
 
   (treemacs-hide-gitignored-files-mode nil))
 
+;;;; Spell check
 (use-package jinx
   :ensure t
   :bind (("M-$" . jinx-correct)
@@ -821,6 +812,7 @@
 ;; Set multiple languages
 (setq jinx-languages "en_US ru_RU")
 
+;;;; Snippets
 ;; The official collection of snippets for yasnippet.
 (use-package yasnippet-snippets
   :ensure t
@@ -848,25 +840,7 @@
   ;; Suppress verbose messages
   (setq yas-verbosity 0))
 
-;; Helpful is an alternative to the built-in Emacs help that provides much more
-;; contextual information.
-(use-package helpful
-  :ensure t
-  :commands (helpful-callable
-             helpful-variable
-             helpful-key
-             helpful-command
-             helpful-at-point
-             helpful-function)
-  :bind
-  ([remap describe-command] . helpful-command)
-  ([remap describe-function] . helpful-callable)
-  ([remap describe-key] . helpful-key)
-  ([remap describe-symbol] . helpful-symbol)
-  ([remap describe-variable] . helpful-variable)
-  :custom
-  (helpful-max-buffers 7))
-
+;;;; Navigation while editing
 (use-package avy
   :ensure t
   :commands (avy-goto-char
@@ -880,3 +854,61 @@
 
 (use-package meow-tree-sitter
   :ensure t)
+
+;;;; Cool things
+;;  Draw ▶─UNICODE diagrams─◀ within ▶─your texts─◀ in Emacs
+(use-package uniline
+  :ensure t
+  :defer t)
+
+;;; Programming Languages
+
+;;;; OCaml
+(use-package tuareg
+  :ensure t
+  :mode (("\\.ocamlinit\\'" . tuareg-mode)))
+
+(use-package dune
+  :ensure t)
+
+;; Merlin configuration
+(use-package merlin
+  :ensure t
+  :config
+  (add-hook 'tuareg-mode-hook #'merlin-mode)
+  (add-hook 'merlin-mode-hook #'company-mode)
+  ;; we're using flycheck instead
+  (setq merlin-error-after-save nil))
+
+(use-package merlin-eldoc
+  :ensure t
+  :hook ((tuareg-mode) . merlin-eldoc-setup))
+
+;; This uses Merlin internally
+(use-package flycheck-ocaml
+  :ensure t
+  :config
+  (flycheck-ocaml-setup))
+
+;; utop — a universal toplevel (i.e., REPL) for OCaml
+(use-package utop
+  :ensure t)
+
+;;;; Markdown
+;; The markdown-mode package provides a major mode for Emacs for syntax
+;; highlighting, editing commands, and preview support for Markdown documents.
+;; It supports core Markdown syntax as well as extensions like GitHub Flavored
+;; Markdown (GFM).
+(use-package markdown-mode
+  :commands (gfm-mode
+             gfm-view-mode
+             markdown-mode
+             markdown-view-mode)
+  :mode (("\\.markdown\\'" . markdown-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("README\\.md\\'" . gfm-mode))
+  :bind
+  (:map markdown-mode-map
+        ("C-c C-e" . markdown-do)))
+
+;;; post-init.el ends here
