@@ -40,11 +40,13 @@
 (keymap-global-set "C-x b" #'consult-buffer)
 
 (keymap-global-unset "s-k") ;; kill-current-buffer
+(keymap-global-set "C-s-W" #'kill-buffer-and-window)
+(keymap-global-set "C-s-k" #'kill-current-buffer)
 (keymap-global-set "C-s-w" #'delete-window)
-(keymap-global-set "C-s--" #'kill-current-buffer)
-(keymap-global-set "C-s-0" #'kill-buffer-and-window)
+
 (keymap-global-set "C-s-," #'previous-buffer)
 (keymap-global-set "C-s-." #'next-buffer)
+
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;;     EDITING     ;;

@@ -5,6 +5,12 @@
 
 ;;; Emacs System Options and Packages
 ;;;; General System Options and Packages
+
+(use-package exec-path-from-shell
+  :ensure t)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+
 ;;;;; Language input config
 (setq-default default-input-method 'russian-computer)
 (use-package reverse-im
@@ -105,7 +111,7 @@
 ;; closing windows.
 (add-hook 'after-init-hook #'winner-mode)
 
-(window-divider-mode nil)
+(window-divider-mode 0)
 (setq-default window-divider-default-bottom-width 0)
 
 (setq frame-resize-pixelwise t)
@@ -166,13 +172,6 @@
         (setq args nil)))
     (when args
       (setq dired-listing-switches args))))
-
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-(use-package exec-path-from-shell
-  :ensure t)
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
 
 ;;; Emacs Appearance
 ;; Paren match highlighting
@@ -250,7 +249,7 @@
 (use-package auto-dark
   :ensure t
   :custom
-  (auto-dark-themes '((doom-dracula) (spacemacs-light)))
+  (auto-dark-themes '((spacemacs-dark) (spacemacs-light)))
   (auto-dark-polling-interval-seconds 5)
   (auto-dark-allow-osascript t)
   :init (auto-dark-mode)
@@ -271,6 +270,8 @@
 
 ;;; Text editing options and packages
 ;;;; General text editing packages and config
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; Simple comment-based outline folding for Emacs
 (use-package outli
   :ensure t
@@ -616,7 +617,11 @@
 (setq switch-to-prev-buffer-skip-regexp "\\*.*\\*")
 (setq consult-buffer-filter
       '("\\` "                           ; Hidden buffers (space prefix)
-        "\\*.*\\*"                      ; All internal buffers
+        "\\*Messages\\*"
+        "\\*straight-process\\*"
+        "\\*Warnings\\*"
+        "\\*Compile-Log\\*"
+        "\\*Async-native-compile-log\\*"
         "^magit-.*:"                    ; Magit process buffers
         "\\`\\*\\(EGLOT\\|LSP\\).*\\*\\'" ; Language server buffers
         "\\`\\*tramp.*\\*\\'"))         ; Tramp buffers
