@@ -259,16 +259,20 @@
 ;; Set the maximum level of syntax highlighting for Tree-sitter modes
 (setq treesit-font-lock-level 4)
 
-(load-theme 'nord-light t)
+(use-package leuven-theme
+  :ensure t)
 
-;; (use-package auto-dark
-;;   :ensure t
-;;   :custom
-;;   (auto-dark-themes '((standard-light) (ef-duo-light)))
-;;   (auto-dark-polling-interval-seconds 5)
-;;   (auto-dark-allow-osascript t)
-;;   :init (auto-dark-mode)
-;;   )
+(use-package nordic-night-theme
+  :ensure t)
+
+(use-package auto-dark
+  :ensure t
+  :custom
+  (auto-dark-themes '((nordic-night) (leuven)))
+  (auto-dark-polling-interval-seconds 5)
+  (auto-dark-allow-osascript t)
+  :init (auto-dark-mode)
+  )
 
 ;;;; Line numbers
 ;; Display the current line and column numbers in the mode line
@@ -286,6 +290,33 @@
 ;;; Text editing options and packages
 ;;;; General text editing packages and config
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Whitespace color corrections.
+(require 'color)
+(let* ((ws-lighten 50) ;; Amount in percentage to lighten up black.
+       (ws-color (color-lighten-name "#000000" ws-lighten)))
+  (custom-set-faces
+   `(whitespace-newline                ((t (:foreground ,ws-color))))
+   `(whitespace-missing-newline-at-eof ((t (:foreground ,ws-color))))
+   `(whitespace-space                  ((t (:foreground ,ws-color))))
+   `(whitespace-space-after-tab        ((t (:foreground ,ws-color))))
+   `(whitespace-space-before-tab       ((t (:foreground ,ws-color))))
+   `(whitespace-tab                    ((t (:foreground ,ws-color))))
+   `(whitespace-trailing               ((t (:foreground ,ws-color))))))
+
+;; Make these characters represent whitespace.
+(setq-default whitespace-display-mappings
+              '(
+                ;; space -> · else .
+                (space-mark 32 [183] [46])
+                ;; new line -> ¬ else $
+                (newline-mark ?\n [172 ?\n] [36 ?\n])
+                ;; carriage return (Windows) -> ¶ else #
+                (newline-mark ?\r [182] [35])
+                ;; tabs -> » else >
+                (tab-mark ?\t [187 ?\t] [62 ?\t])))
+
+(global-subword-mode t)
 
 ;; Simple comment-based outline folding for Emacs
 (use-package outli
@@ -663,21 +694,27 @@
              eglot-format-buffer))
 
 ;; Package manager for LSP, DAP, linters, and more for the Emacs Operating System
-;; (use-package mason
-;;   :ensure t
-;;   :config
-;;   (mason-ensure)
-;;   ;; or
-;;   :hook
-;;   (after-init-hook . mason-ensure))
+(use-package mason
+  :ensure t
+  :config
+  (mason-setup))
 
 ;; Apheleia is an Emacs package designed to run code formatters (e.g., Shfmt,
 ;; Black and Prettier) asynchronously without disrupting the cursor position.
 (use-package apheleia
   :ensure t
-  :commands (apheleia-mode
-             apheleia-global-mode)
-  :hook ((prog-mode . apheleia-mode)))
+  :hook ((prog-mode . apheleia-mode))
+  :config
+  ;; Configure formatters after apheleia loads
+  (setf (alist-get 'python-mode apheleia-mode-alist)
+        '(ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+        '(ruff))
+  (setf (alist-get 'c++-mode apheleia-mode-alist)
+        '(clang-format))
+  (setf (alist-get 'c++-ts-mode apheleia-mode-alist)
+        '(clang-format)))
+
 
 ;; Enables automatic indentation of code while typing
 (use-package aggressive-indent
@@ -788,12 +825,15 @@
 
 ;;; Programming Languages
 
+;;;; Python
+(setq python-shell-interpreter "python3")
+
 ;;;; Vimrc
 (use-package vimrc-mode
   :ensure t)
 
 ;;;; LaTeX
-(load (expand-file-name "latex.el" user-emacs-directory) t t)
+;; (load (expand-file-name "latex.el" user-emacs-directory) t t)
 
 ;;;; Markdown
 ;; The markdown-mode package provides a major mode for Emacs for syntax
@@ -811,5 +851,22 @@
   :bind
   (:map markdown-mode-map
         ("C-c C-e" . markdown-do)))
+
+;;;; Typst
+
+(use-package typst-ts-mode
+  :ensure t)
+
+(use-package typst-preview
+  :ensure t)
+
+(with-eval-after-load 'eglot
+  (with-eval-after-load 'typst-ts-mode
+    (add-to-list 'eglot-server-programs
+                 `((typst-ts-mode) .
+                   ,(eglot-alternatives `(,typst-ts-lsp-download-path
+                                          "tinymist"
+                                          "typst-lsp"))))))
+
 
 ;;; post-init.el ends here

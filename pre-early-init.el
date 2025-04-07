@@ -9,4 +9,3 @@
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "themes" user-emacs-directory))
 
-(add-to-list 'default-frame-alist '(undecorated-round . t))
