@@ -32,7 +32,7 @@
   ;; A global mode that compiles .el files prior to loading them via `load' or
   ;; `require'. Additionally, it compiles all packages that were loaded before
   ;; the mode `compile-angel-on-load-mode' was activated.
-  (compile-angel-on-load-mode 1)
+  (compile-angel-on-load-mode t)
   )
 
 (use-package rainbow-mode
