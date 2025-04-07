@@ -868,5 +868,4 @@
                                           "tinymist"
                                           "typst-lsp"))))))
 
-
 ;;; post-init.el ends here
